@@ -1,4 +1,8 @@
-# tensorflow-project-template
+# oputuna-sample
+
+- Tensorflow1.8.0 で実験
+
+  - python3.6.6 で動作確認
 
 - GitHub では既存の Repository を Template として、新しい Repository を作成することができる
   - https://dev.classmethod.jp/articles/github-template-repository/
