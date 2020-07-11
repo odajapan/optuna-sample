@@ -1,0 +1,14 @@
+pandas >= 1.0.4
+numpy >= 1.18.4
+jupyterlab >= 2.1.4
+matplotlib >= 3.2.1
+seaborn >= 0.10.1
+tensorboard >= 2.2.2
+tensorflow >= 2.2.0
+scikit-learn >= 0.23.1
+Pillow >= 7.1.2
+graphviz >= 0.14
+pydot >= 1.4.1
+pydotplus >= 2.0.2
+opencv-python >= 4.2.0.34
+tensorflow-addons >= 0.10.0
