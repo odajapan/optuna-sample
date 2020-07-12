@@ -137,3 +137,5 @@ dmypy.json
 data/
 env-*/
 results/*
+log/*
+model/*

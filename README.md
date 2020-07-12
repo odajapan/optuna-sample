@@ -1,10 +1,11 @@
 # oputuna-sample
 
 - Tensorflow1.8.0 で実験
-
   - python3.6.6 で動作確認
 
-- GitHub では既存の Repository を Template として、新しい Repository を作成することができる
+* https://qiita.com/kzmssk/items/5c433bbf60d0a86a47fa
+
+* GitHub では既存の Repository を Template として、新しい Repository を作成することができる
   - https://dev.classmethod.jp/articles/github-template-repository/
 
 ## Python のバージョン

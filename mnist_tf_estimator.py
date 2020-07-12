@@ -1,7 +1,50 @@
-from utils import *
 import numpy as np
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
+import os
+import shutil
+
+
+def make_empty_dir(dir):
+    """
+    空のディレクトリを生成。
+    すでに存在しているディレクトリの場合、中身を削除
+
+    Parameters
+    ----------
+    dir : str
+        ディレクトリのパス
+    """
+    os.makedirs(dir, exist_ok=True)
+    shutil.rmtree(dir)
+    os.makedirs(dir, exist_ok=False)
+
+
+def get_network2(x):
+    h = tf.layers.conv2d(
+        x,
+        filters=4,
+        kernel_size=4,
+        strides=2,
+        padding='same',
+        activation=tf.tanh
+    )
+    h = tf.nn.dropout(h, dp_keep_prob)
+
+    h = tf.layers.conv2d(
+        h,
+        filters=4,
+        kernel_size=4,
+        strides=2,
+        padding='same',
+        activation=tf.tanh
+    )
+    h = tf.nn.dropout(h, dp_keep_prob)
+
+    h = tf.layers.flatten(h)
+
+    y = tf.layers.dense(h, 10, activation=tf.tanh)
+    return x
 
 
 def get_network(x):
@@ -111,10 +154,10 @@ if __name__ == '__main__':
 
     # configuration of the model
     my_config = tf.estimator.RunConfig(
-        save_checkpoints_steps=100,
+        save_checkpoints_steps=1000,
         keep_checkpoint_max=5,
-        log_step_count_steps=2,
-        save_summary_steps=2,
+        log_step_count_steps=1000,
+        save_summary_steps=1000,
     )
 
     # create model
@@ -128,9 +171,9 @@ if __name__ == '__main__':
 
     # create input pipeline for training.
     train_input_fn = tf.estimator.inputs.numpy_input_fn(
-        x={'x': mnist.train.images[:batch_size].astype(np.float32)},
+        x={'x': mnist.train.images.astype(np.float32)},
         #x={'x': train_x},
-        y=mnist.train.labels[:batch_size].astype(np.float32),
+        y=mnist.train.labels.astype(np.float32),
         # y=train_y,
         batch_size=batch_size,
         shuffle=True,
