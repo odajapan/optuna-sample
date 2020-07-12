@@ -26,6 +26,14 @@ class AbstractEstimator(metaclass=ABCMeta):
     def get_loss_and_optimizer(self, y, labels, learning_rate=0.001):
         pass
 
+    def get_model(self, model_dir='./model'):
+        return tf.estimator.Estimator(
+            model_dir=model_dir,
+            model_fn=self.model_fn,
+            params=self.TrainParams,
+            config=self.RunConfig
+        )
+
     def train(self, train_x, train_y, test_x, test_y, val_x=None, val_y=None, model_dir='./model', batch_size=1000, epochs=3):
         if val_x == None:
             data_len = int(len(test_x) * 0.1)
@@ -33,12 +41,7 @@ class AbstractEstimator(metaclass=ABCMeta):
             val_y = test_y[:data_len]
 
         # create model
-        model = tf.estimator.Estimator(
-            model_dir=model_dir,
-            model_fn=self.model_fn,
-            params=self.TrainParams,
-            config=self.RunConfig
-        )
+        model = self.get_model(model_dir)
 
         # create input pipeline for training.
         train_input_fn = self.get_input(train_x, train_y, epochs, batch_size)
