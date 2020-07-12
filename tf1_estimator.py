@@ -8,10 +8,10 @@ class AbstractEstimator(metaclass=ABCMeta):
     def __init__(self):
         # configuration of the model
         self.RunConfig = tf.estimator.RunConfig(
-            save_checkpoints_steps=1000,
-            keep_checkpoint_max=5,
-            log_step_count_steps=1000,
-            save_summary_steps=1000,
+            # save_checkpoints_steps=1000,
+            # keep_checkpoint_max=5,
+            # log_step_count_steps=1000,
+            # save_summary_steps=1000,
         )
 
         self.TrainParams = {
@@ -40,8 +40,8 @@ class AbstractEstimator(metaclass=ABCMeta):
         eval_input_fn = self.get_input(val_x, val_y, 1, batch_size)
 
         # start the training.
-        train_spec = tf.estimator.TrainSpec(
-            input_fn=train_input_fn, max_steps=50)
+        #train_spec = tf.estimator.TrainSpec(input_fn=train_input_fn, max_steps=50)
+        train_spec = tf.estimator.TrainSpec(input_fn=train_input_fn)
         eval_spec = tf.estimator.EvalSpec(input_fn=eval_input_fn)
 
         return train_spec, eval_spec, train_input_fn, eval_input_fn
