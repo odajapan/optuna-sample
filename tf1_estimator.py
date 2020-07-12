@@ -34,6 +34,18 @@ class AbstractEstimator(metaclass=ABCMeta):
             config=self.RunConfig
         )
 
+    def get_train_and_eval_specs(self, train_x, train_y, val_x, val_y, epochs, batch_size):
+        # create input pipeline for training.
+        train_input_fn = self.get_input(train_x, train_y, epochs, batch_size)
+        eval_input_fn = self.get_input(val_x, val_y, 1, batch_size)
+
+        # start the training.
+        train_spec = tf.estimator.TrainSpec(
+            input_fn=train_input_fn, max_steps=50)
+        eval_spec = tf.estimator.EvalSpec(input_fn=eval_input_fn)
+
+        return train_spec, eval_spec
+
     def train(self, train_x, train_y, test_x, test_y, val_x=None, val_y=None, model_dir='./model', batch_size=1000, epochs=3):
         if val_x == None:
             data_len = int(len(test_x) * 0.1)
@@ -43,14 +55,11 @@ class AbstractEstimator(metaclass=ABCMeta):
         # create model
         model = self.get_model(model_dir)
 
-        # create input pipeline for training.
-        train_input_fn = self.get_input(train_x, train_y, epochs, batch_size)
-        eval_input_fn = self.get_input(val_x, val_y, 1, batch_size)
+        train_spec, eval_spec = self.get_train_and_eval_specs(train_x=train_x, train_y=train_y,
+                                                              val_x=val_x, val_y=val_y,
+                                                              epochs=epochs, batch_size=batch_size
+                                                              )
 
-        # start the training.
-        train_spec = tf.estimator.TrainSpec(
-            input_fn=train_input_fn, max_steps=50)
-        eval_spec = tf.estimator.EvalSpec(input_fn=eval_input_fn)
         tf.estimator.train_and_evaluate(model, train_spec, eval_spec)
 
         # get prediction after training.
@@ -58,9 +67,7 @@ class AbstractEstimator(metaclass=ABCMeta):
         test_input_fn = self.get_input(
             test_x, test_y, 1, batch_size, shuffle=False)
 
-        preds = model.predict(
-            input_fn=test_input_fn,
-        )
+        preds = model.predict(input_fn=test_input_fn)
 
         # this is numpy array
         for pred in preds:
