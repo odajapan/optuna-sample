@@ -21,30 +21,6 @@ def make_empty_dir(dir):
     os.makedirs(dir, exist_ok=False)
 
 
-'''
-parser = argparse.ArgumentParser(description="test")
-data_path = os.path.join(
-    os.path.expanduser('~'),
-    'data'
-)
-parser.add_argument('--data_path', default=data_path,
-                    help='path to save data. default is ~/data.')
-parser.add_argument('--batch_size', type=int, default=5, help='size of batch')
-parser.add_argument('--steps', type=int, default=10,
-                    help='max number of training batch iteration')
-parser.add_argument('--save_every', type=int, default=10,
-                    help='interval of saving per step')
-parser.add_argument('--save_max', type=int, default=5,
-                    help='number of maximum checkpoints')
-parser.add_argument('--log_every', type=int, default=2,
-                    help='interval of logging per step')
-parser.add_argument('--summ_every', type=int, default=2,
-                    help='interval of recording summary per step')
-parser.add_argument('--model_dir', default='log/test',
-                    help='directory to put training log')
-'''
-
-
 def get_data_as_np(mnist):
     train_x = mnist.train.images
     train_y = mnist.train.labels
@@ -129,23 +105,13 @@ def model_fn(features, labels, mode, params):
 
 
 def main(argv):
-    # parse arguments
-    #args = parser.parse_args(argv[1:])
-
-    # create log directory
-    # tf.gfile.MakeDirs(args.model_dir)
-
-    # maybe download mnist data
-    # data is numpy.arrays
-
-    mnist = input_data.read_data_sets("./data/mnist", one_hot=True)
-
     model_dir = './model'
     batch_size = 1000
     epochs = 3
 
     make_empty_dir(model_dir)
 
+    mnist = input_data.read_data_sets("./data/mnist", one_hot=True)
     train_x, train_y, test_x, test_y = get_data_as_np(mnist)
 
     # configuration of the model
