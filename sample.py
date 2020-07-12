@@ -3,8 +3,25 @@ import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 import argparse
 import os
+import shutil
 
 
+def make_empty_dir(dir):
+    """
+    空のディレクトリを生成。
+    すでに存在しているディレクトリの場合、中身を削除
+
+    Parameters
+    ----------
+    dir : str
+        ディレクトリのパス
+    """
+    os.makedirs(dir, exist_ok=True)
+    shutil.rmtree(dir)
+    os.makedirs(dir, exist_ok=False)
+
+
+'''
 parser = argparse.ArgumentParser(description="test")
 data_path = os.path.join(
     os.path.expanduser('~'),
@@ -25,6 +42,7 @@ parser.add_argument('--summ_every', type=int, default=2,
                     help='interval of recording summary per step')
 parser.add_argument('--model_dir', default='log/test',
                     help='directory to put training log')
+'''
 
 
 def get_data_as_np(mnist):
@@ -107,20 +125,28 @@ def model_fn(features, labels, mode, params):
     # summaries to be shown in tensorboard
     tf.summary.scalar('train_loss', loss)
 
-    return tf.estimator.EstimatorSpec(mode, loss=loss, train_op=train_op)
+    return tf.estimator.EstimatorSpec(mode, loss=loss, train_op=optimizer)
 
 
 def main(argv):
     # parse arguments
-    args = parser.parse_args(argv[1:])
+    #args = parser.parse_args(argv[1:])
 
     # create log directory
-    tf.gfile.MakeDirs(args.model_dir)
+    # tf.gfile.MakeDirs(args.model_dir)
 
     # maybe download mnist data
     # data is numpy.arrays
-    train_x, train_y, test_x, test_y = get_data_as_np(
-        input_data.read_data_sets(args.data_path, one_hot=True))
+
+    mnist = input_data.read_data_sets("./data/mnist", one_hot=True)
+
+    model_dir = './model'
+    batch_size = 1000
+    epochs = 3
+
+    make_empty_dir(model_dir)
+
+    train_x, train_y, test_x, test_y = get_data_as_np(mnist)
 
     # configuration of the model
     my_config = tf.estimator.RunConfig(
@@ -136,14 +162,14 @@ def main(argv):
         params={
 
         },
-        model_dir=args.model_dir,
+        model_dir=model_dir,
         config=my_config)
 
     # create input pipeline for training.
     train_input_fn = tf.estimator.inputs.numpy_input_fn(
         x={'x': train_x},
         y=train_y,
-        batch_size=args.batch_size,
+        batch_size=batch_size,
         shuffle=True,
         num_epochs=3
     )
@@ -152,22 +178,21 @@ def main(argv):
     eval_input_fn = tf.estimator.inputs.numpy_input_fn(
         x={'x': test_x},
         y=test_y,
-        batch_size=args.batch_size,
+        batch_size=batch_size,
         shuffle=True,
         num_epochs=1
     )
 
     # start the training.
-    train_spec = tf.estimator.TrainSpec(
-        input_fn=train_input_fn, max_steps=args.steps)
+    train_spec = tf.estimator.TrainSpec(input_fn=train_input_fn, max_steps=10)
     eval_spec = tf.estimator.EvalSpec(input_fn=eval_input_fn)
     tf.estimator.train_and_evaluate(model, train_spec, eval_spec)
 
     # get prediction after training.
     test_input_fn = tf.estimator.inputs.numpy_input_fn(
-        x={'x': test_x[:args.batch_size]},
-        y=test_y[:args.batch_size],
-        batch_size=args.batch_size,
+        x={'x': test_x[:batch_size]},
+        y=test_y[:batch_size],
+        batch_size=batch_size,
         shuffle=False
     )
 
