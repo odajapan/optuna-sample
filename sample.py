@@ -65,7 +65,7 @@ def get_network(input):
     return y
 
 
-def get_loss_and_optimizer(y, labels):
+def get_loss_and_optimizer(y, labels, learning_rate=0.001):
     # get loss
     loss = tf.losses.mean_squared_error(y, labels)
 
@@ -89,7 +89,8 @@ def model_fn(features, labels, mode, params):
         return tf.estimator.EstimatorSpec(mode, predictions=predictions)
 
     # calc loss
-    loss, optimizer = get_loss_and_optimizer(y, labels)
+    learning_rate = params['learning_rate']
+    loss, optimizer = get_loss_and_optimizer(y, labels, learning_rate)
 
     # mode for evaluation
     if mode == tf.estimator.ModeKeys.EVAL:
@@ -136,7 +137,7 @@ def main(argv):
     model = tf.estimator.Estimator(
         model_fn=model_fn,
         params={
-
+            'learning_rate': 0.001
         },
         model_dir=model_dir,
         config=my_config)
