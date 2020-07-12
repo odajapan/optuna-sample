@@ -59,8 +59,8 @@ def get_network(input):
     h = tf.nn.dropout(h, dp_keep_prob)
 
     h = tf.layers.flatten(h)
-
     y = tf.layers.dense(h, 10, activation=tf.tanh)
+    y = tf.nn.softmax(y)
 
     return y
 
@@ -148,7 +148,7 @@ def main(argv):
         test_x[:batch_size], test_y[:batch_size], 1, batch_size)
 
     # start the training.
-    train_spec = tf.estimator.TrainSpec(input_fn=train_input_fn, max_steps=10)
+    train_spec = tf.estimator.TrainSpec(input_fn=train_input_fn, max_steps=50)
     eval_spec = tf.estimator.EvalSpec(input_fn=eval_input_fn)
     tf.estimator.train_and_evaluate(model, train_spec, eval_spec)
 
