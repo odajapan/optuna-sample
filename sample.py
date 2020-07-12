@@ -104,6 +104,16 @@ def model_fn(features, labels, mode, params):
     return tf.estimator.EstimatorSpec(mode, loss=loss, train_op=optimizer)
 
 
+def get_input(x, y, epochs, batch_size, shuffle=True):
+    return tf.estimator.inputs.numpy_input_fn(
+        x={'x': x},
+        y=y,
+        num_epochs=epochs,
+        batch_size=batch_size,
+        shuffle=shuffle,
+    )
+
+
 def main(argv):
     model_dir = './model'
     batch_size = 1000
@@ -132,22 +142,9 @@ def main(argv):
         config=my_config)
 
     # create input pipeline for training.
-    train_input_fn = tf.estimator.inputs.numpy_input_fn(
-        x={'x': train_x},
-        y=train_y,
-        batch_size=batch_size,
-        shuffle=True,
-        num_epochs=3
-    )
-
-    # create input pipeline for evaluation.
-    eval_input_fn = tf.estimator.inputs.numpy_input_fn(
-        x={'x': test_x},
-        y=test_y,
-        batch_size=batch_size,
-        shuffle=True,
-        num_epochs=1
-    )
+    train_input_fn = get_input(train_x, train_y, epochs, batch_size)
+    eval_input_fn = get_input(
+        test_x[:batch_size], test_y[:batch_size], 1, batch_size)
 
     # start the training.
     train_spec = tf.estimator.TrainSpec(input_fn=train_input_fn, max_steps=10)
@@ -155,14 +152,9 @@ def main(argv):
     tf.estimator.train_and_evaluate(model, train_spec, eval_spec)
 
     # get prediction after training.
-    test_input_fn = tf.estimator.inputs.numpy_input_fn(
-        x={'x': test_x[:batch_size]},
-        y=test_y[:batch_size],
-        batch_size=batch_size,
-        shuffle=False
-    )
-
     # predict() returns generator
+    test_input_fn = get_input(test_x, test_y, 1, batch_size, shuffle=False)
+
     preds = model.predict(
         input_fn=test_input_fn,
     )
